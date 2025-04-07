@@ -1,0 +1,47 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+     mockitoAgent
+ }
+
+dependencies {
+    testImplementation libs.junit.jupiter
+    testImplementation "org.mockito:mockito-junit-jupiter:5.17.0"
+    mockitoAgent("org.mockito:mockito-core:5.17.0") {
+       transitive = false
+    }
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation libs.guava
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.18.3"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+application {
+    mainClass = 'org.example.App'
+}
+
+run {
+    standardInput = System.in
+}
+
+tasks.named('test') {
+  jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+  useJUnitPlatform()
+  testLogging {
+      events "passed", "skipped", "failed"
+      showStandardStreams = true
+  }
+}
